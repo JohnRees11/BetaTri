@@ -726,7 +726,7 @@ STATIC_UNIT_TESTED void servoMixer(void)
             uint16_t servo_width = servoConf[target].max - servoConf[target].min;
             int16_t min = currentServoMixer[i].min * servo_width / 100 - servo_width / 2;
             int16_t max = currentServoMixer[i].max * servo_width / 100 - servo_width / 2;
-
+            uint8_t throttleTailAtn = (INPUT_RC_THROTTLE/100)*currentServoMixer[i].rate;
             if (currentServoMixer[i].speed == 0)
                 currentOutput[i] = input[from];
             else {
@@ -736,7 +736,8 @@ STATIC_UNIT_TESTED void servoMixer(void)
                     currentOutput[i] = constrain(currentOutput[i] - currentServoMixer[i].speed, input[from], currentOutput[i]);
             }
 
-            servo[target] += servoDirection(target, from) * constrain(((int32_t)currentOutput[i] * currentServoMixer[i].rate) / 100, min, max);
+            //servo[target] += servoDirection(target, from) * constrain(((int32_t)currentOutput[i] * currentServoMixer[i].rate) / 100, min, max);
+            servo[target] += servoDirection(target, from) * constrain(((int32_t)currentOutput[i] * throttleTailAtn) / 100, min, max);
         } else {
             currentOutput[i] = 0;
         }
@@ -942,7 +943,7 @@ void mixTable(void)
 
         /*
         case MIXER_GIMBAL:
-			servo[SERVO_GIMBAL_PITCH] = (((int32_t)servoConf[SERVO_GIMBAL_PITCH].rate * attitude.values.pitch) / 50) + determineServoMiddleOrForwardFromChannel(SERVO_GIMBAL_PITCH);
+            servo[SERVO_GIMBAL_PITCH] = (((int32_t)servoConf[SERVO_GIMBAL_PITCH].rate * attitude.values.pitch) / 50) + determineServoMiddleOrForwardFromChannel(SERVO_GIMBAL_PITCH);
             servo[SERVO_GIMBAL_ROLL] = (((int32_t)servoConf[SERVO_GIMBAL_ROLL].rate * attitude.values.roll) / 50) + determineServoMiddleOrForwardFromChannel(SERVO_GIMBAL_ROLL);
             break;
         */

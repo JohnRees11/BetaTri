@@ -590,7 +590,7 @@ void writeServos(void)
                 if (ARMING_FLAG(ARMED))
                     pwmWriteServo(servoIndex++, servo[SERVO_RUDDER]);
                 else
-                    pwmWriteServo(servoIndex++, 0); // kill servo signal completely.
+                    pwmWriteServo(servoIndex++, servo[SERVO_RUDDER]); // no servo kill on this build
             }
             break;
 

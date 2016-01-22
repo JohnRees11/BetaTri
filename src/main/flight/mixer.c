@@ -80,7 +80,7 @@ static int useServo;
 STATIC_UNIT_TESTED uint8_t servoCount;
 static servoParam_t *servoConf;
 static lowpass_t lowpassFilters[MAX_SUPPORTED_SERVOS];
-bool TSA = false;
+bool TSA = true;
 #endif
 
 static const motorMixer_t mixerQuadX[] = {

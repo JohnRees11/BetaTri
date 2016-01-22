@@ -729,8 +729,8 @@ STATIC_UNIT_TESTED void servoMixer(void)
             int16_t max = currentServoMixer[i].max * servo_width / 100 - servo_width / 2;
             //THIS BUILD REQUIRES THAT THE MIN THROTTLE MUST BE 100
             uint8_t throttleTailAtn = ((2000-INPUT_RC_THROTTLE)/1000)*currentServoMixer[i].rate;
-            int16_t TSAmin =currentServoMixer[i].min * servo_width/100 - servo_width / 2;
-            int16_t TSAmax = currentServoMixer[i].min * servo_width/100 - servo_width / 2;
+            int16_t TSAmin =(currentServoMixer[i].min * servo_width/100 - servo_width / 2)*((2000-INPUT_RC_THROTTLE)/1000);
+            int16_t TSAmax = (currentServoMixer[i].min * servo_width/100 - servo_width / 2)*((2000-INPUT_RC_THROTTLE)/1000);
         if(TSA==true){
 
             if (currentServoMixer[i].speed == 0){

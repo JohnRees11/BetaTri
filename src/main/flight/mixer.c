@@ -80,6 +80,7 @@ static int useServo;
 STATIC_UNIT_TESTED uint8_t servoCount;
 static servoParam_t *servoConf;
 static lowpass_t lowpassFilters[MAX_SUPPORTED_SERVOS];
+bool TSA = false;
 #endif
 
 static const motorMixer_t mixerQuadX[] = {
@@ -728,7 +729,25 @@ STATIC_UNIT_TESTED void servoMixer(void)
             int16_t max = currentServoMixer[i].max * servo_width / 100 - servo_width / 2;
             //THIS BUILD REQUIRES THAT THE MIN THROTTLE MUST BE 100
             uint8_t throttleTailAtn = ((2000-INPUT_RC_THROTTLE)/1000)*currentServoMixer[i].rate;
-            if (currentServoMixer[i].speed == 0)
+            int16_t TSAmin =currentServoMixer[i].min * servo_width/100 - servo_width / 2;
+            int16_t TSAmax = currentServoMixer[i].min * servo_width/100 - servo_width / 2;
+        if(TSA==true){
+
+            if (currentServoMixer[i].speed == 0){
+                currentOutput[i] = input[from];
+            
+            }else {
+                if (currentOutput[i] < input[from])
+                    currentOutput[i] = constrain(currentOutput[i] + currentServoMixer[i].speed, currentOutput[i], input[from]);
+                else if (currentOutput[i] > input[from])
+                    currentOutput[i] = constrain(currentOutput[i] - currentServoMixer[i].speed, input[from], currentOutput[i]);
+            }
+
+            //servo[target] += servoDirection(target, from) * constrain(((int32_t)currentOutput[i] * currentServoMixer[i].rate) / 100, min, max);
+            servo[target] += servoDirection(target, from) * constrain(((int32_t)currentOutput[i] * throttleTailAtn) / 100, TSAmin, TSAmax);
+        }else{
+                //Turn TTSA Off
+                 if (currentServoMixer[i].speed == 0)
                 currentOutput[i] = input[from];
             else {
                 if (currentOutput[i] < input[from])
@@ -737,11 +756,12 @@ STATIC_UNIT_TESTED void servoMixer(void)
                     currentOutput[i] = constrain(currentOutput[i] - currentServoMixer[i].speed, input[from], currentOutput[i]);
             }
 
-            //servo[target] += servoDirection(target, from) * constrain(((int32_t)currentOutput[i] * currentServoMixer[i].rate) / 100, min, max);
-            servo[target] += servoDirection(target, from) * constrain(((int32_t)currentOutput[i] * throttleTailAtn) / 100, min, max);
+            servo[target] += servoDirection(target, from) * constrain(((int32_t)currentOutput[i] * currentServoMixer[i].rate) / 100, min, max);
+        }
         } else {
             currentOutput[i] = 0;
         }
+    
     }
 
     for (i = 0; i < MAX_SUPPORTED_SERVOS; i++) {  

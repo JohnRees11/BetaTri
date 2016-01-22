@@ -727,7 +727,7 @@ STATIC_UNIT_TESTED void servoMixer(void)
             int16_t min = currentServoMixer[i].min * servo_width / 100 - servo_width / 2;
             int16_t max = currentServoMixer[i].max * servo_width / 100 - servo_width / 2;
             //THIS BUILD REQUIRES THAT THE MIN THROTTLE MUST BE 100
-            uint8_t throttleTailAtn = ((2000-INPUT_RC_THROTTLE)/1000)/currentServoMixer[i].rate;
+            uint8_t throttleTailAtn = ((2000-INPUT_RC_THROTTLE)/1000)*currentServoMixer[i].rate;
             if (currentServoMixer[i].speed == 0)
                 currentOutput[i] = input[from];
             else {
@@ -744,7 +744,7 @@ STATIC_UNIT_TESTED void servoMixer(void)
         }
     }
 
-    for (i = 0; i < MAX_SUPPORTED_SERVOS; i++) {
+    for (i = 0; i < MAX_SUPPORTED_SERVOS; i++) {  
         servo[i] = ((int32_t)servoConf[i].rate * servo[i]) / 100L;
         servo[i] += determineServoMiddleOrForwardFromChannel(i);
     }

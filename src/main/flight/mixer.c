@@ -776,7 +776,8 @@ void mixTable(void)
 {
     uint32_t i;
 
-    bool isFailsafeActive = failsafeIsActive(); // TODO - Find out if failsafe checks are really needed here in mixer code
+//bool isFailsafeActive = failsafeIsActive(); // TODO - Find out if failsafe checks are really needed here in mixer code
+    //TODO - They don't
 
     if (motorCount >= 4 && mixerConfig->yaw_jump_prevention_limit < YAW_JUMP_PREVENTION_LIMIT_HIGH) {
         // prevent "yaw jump" during yaw correction

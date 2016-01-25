@@ -99,7 +99,7 @@ static const motorMixer_t mixerTricopter[] = {
 static const motorMixer_t mixerQuadP[] = {
     { 1.0f,  0.0f,  1.0f, -1.0f },          // REAR
     { 1.0f, -1.0f,  0.0f,  1.0f },          // RIGHT
-    { 1.0f,  1.0f,  0.0f,  1.0f },          // LEFT
+    {  1.0f,  0.0f,       1.0f, -1.0f  },          // LEFT
     { 1.0f,  0.0f, -1.0f, -1.0f },          // FRONT
 };
 
@@ -776,9 +776,8 @@ void mixTable(void)
 {
     uint32_t i;
 
-//bool isFailsafeActive = failsafeIsActive(); // TODO - Find out if failsafe checks are really needed here in mixer code
-    //TODO - They don't
-
+bool isFailsafeActive = failsafeIsActive(); // TODO - Find out if failsafe checks are really needed here in mixer code
+    //TODO - It does, copter will not start without it.
     if (motorCount >= 4 && mixerConfig->yaw_jump_prevention_limit < YAW_JUMP_PREVENTION_LIMIT_HIGH) {
         // prevent "yaw jump" during yaw correction
         axisPID[YAW] = constrain(axisPID[YAW], -mixerConfig->yaw_jump_prevention_limit - ABS(rcCommand[YAW]), mixerConfig->yaw_jump_prevention_limit + ABS(rcCommand[YAW]));

@@ -37,8 +37,9 @@ typedef enum {
 } pidIndex_e;
 
 typedef enum {
-    PID_CONTROLLER_MWREWRITE = 1,
+    PID_CONTROLLER_MWREWRITE = 3,
     PID_CONTROLLER_LUX_FLOAT,
+    PID_CONTROLLER_BASIC,
     PID_COUNT
 } pidControllerType_e;
 

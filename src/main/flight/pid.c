@@ -385,6 +385,40 @@ static void pidRewrite(pidProfile_t *pidProfile, controlRateConfig_t *controlRat
     }
 }
 
+static void pidBasic(pidProfile_t *pidProfile, controlRateConfig_t *controlRateConfig, uint16_t max_angle_inclination,
+        rollAndPitchTrims_t *angleTrim, rxConfig_t *rxConfig){
+    //This is the most basic pid controller uses rectangualr remond sums for calculation thus improving accuracy over the right hand remond sum
+    //basic varible setup
+    int axis; //axis int
+    int32_t PTerm, ITerm, DTerm, delta; //Here are the critical terms to our equations. Porportional, integral, and differential; these will come in handy later
+    static int32_t lastError[3] = { 0, 0, 0 }; //Error 32s
+    static int32_t previousErrorGyroI[3] = { 0, 0, 0 }; //previous error 32s
+    int32_t AngleRateTmp, RateError, gyroRate;  //more rates 
+    for(axis = 0; axis < 3; axis++){ //Loop through all axies
+            uint8_t rate = 10;//set our rate to be 10 
+            gyroRate = gyroADC[axis] / 4;
+            RateError = AngleRateTmp - gyroRate;
+            //Pterm calculaton
+             PTerm = (RateError * pidProfile->P8[axis] * PIDweight[axis] / 100) >> 7;
+             //Iterm 
+             errorGyroI[axis] = errorGyroI[axis] + ((RateError * (uint16_t)targetLooptime) >> 11) * pidProfile->I8[axis];
+             errorGyroI[axis] = constrain(errorGyroI[axis], (int32_t) - GYRO_I_MAX << 13, (int32_t) + GYRO_I_MAX << 13);
+             ITerm = errorGyroI[axis] >> 13;
+             //DTerm
+            delta = RateError - lastError[axis]; // 16 bits is ok here, the dif between 2 consecutive gyro reads is limited to 800
+            lastError[axis] = RateError;
+
+            if (deltaStateIsSet) {
+                delta = lrintf(applyBiQuadFilter((float) delta, &deltaBiQuadState[axis]));
+            }
+            delta = (delta * ((uint16_t) 0xFFFF / ((uint16_t)targetLooptime >> 4))) >> 6;
+            DTerm = (delta * 3 * pidProfile->D8[axis] * PIDweight[axis] / 100) >> 8;
+            axisPID[axis] = PTerm + ITerm + DTerm;
+
+
+    }
+}
+
 void pidSetController(pidControllerType_e type)
 {
     switch (type) {
@@ -394,6 +428,9 @@ void pidSetController(pidControllerType_e type)
             break;
         case PID_CONTROLLER_LUX_FLOAT:
             pid_controller = pidLuxFloat;
+            break;
+        case PID_CONTROLLER_BASIC:
+            pid_controller = pidBasic;
     }
 }
 
